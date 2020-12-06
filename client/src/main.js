@@ -2,10 +2,11 @@ import Vue from "vue";
 import App from "./App.vue";
 import VCalendar from "v-calendar";
 import store from "./store";
-
+import UUID from "vue-uuid";
 import moment from "moment";
 
-Vue.prototype.moment = moment;
+Vue.use(UUID);
+Vue.prototype.$moment = moment;
 
 Vue.use(VCalendar, {
   componentPrefix: "v",

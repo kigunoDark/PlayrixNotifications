@@ -10,10 +10,10 @@
           <div>
             <label> Время </label>
             <v-date-picker v-model="date"
-                           mode="dateTime"
-                           :timezone="timezone"
-                           @input="onChange"
-                           is24hr>
+                          mode="dateTime"
+                          :timezone="timezone"
+                          @input="onChange"
+                          is24hr>
 
               <template v-slot="{ inputValue, inputEvents }">
                 <input
@@ -26,7 +26,7 @@
             </v-date-picker>
           </div>
           <div>
-            <button class="add_btn" type="submit">
+            <button class="btn add" type="submit">
               Добавить
             </button>
           </div>
@@ -57,6 +57,7 @@ export default {
     onSubmit() {
       if (this.date && this.event) {
         const newEvent = {
+          noteId: this.$uuid.v4(),
           event: this.event,
           date: this.date,
           status: false
@@ -97,15 +98,22 @@ export default {
 
 <style scoped>
 .container {
+  max-width: 1400px;
   width: 90%;
   margin: 0 auto;
+  box-sizing: border-box;
 }
 
 .row {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   margin: 1rem auto;
+}
+
+.row div {
+  text-align: left;
+  width: 30%;
 }
 
 .note_menu {
@@ -115,20 +123,25 @@ export default {
   padding: 0.5rem 2rem;
 }
 
-.add_btn {
+.btn {
+  float: right;
+  outline: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+}
+
+
+.add {
   cursor: pointer;
   background: rgb(255, 255, 255);
-  padding: 10px 20px;
   border: 1px solid #056175;
-  border-radius: 8px;
   color: #056175;
   font-weight: bold;
   text-transform: uppercase;
-  outline: none;
   transition: 0.3s;
 }
 
-.add_btn:hover {
+.add:hover {
   background: #056175;
   color: white;
 }
@@ -145,5 +158,22 @@ export default {
   border: 1px solid #056175;
   outline: none;
   padding: 5px;
+  width: 90%
+}
+
+@media screen and (max-width: 900px) {
+.row {
+  flex-direction: column;
+}
+.row div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: left;
+  margin-top: 20px;
+  font-weight: bold;
+  text-transform: uppercase;
+  width: 95%;
+}
 }
 </style>

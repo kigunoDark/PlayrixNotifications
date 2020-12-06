@@ -1,19 +1,35 @@
-import moment from "moment";
+import {
+  GET_ALL_NOTES,
+  ADD_NOTE,
+  UPDATE_STATUS,
+  DELETE_NOTE,
+} from "./actions.type";
+
+import {
+  UPDATE_NOTES,
+  CREATE_NOTE,
+  STOP_LOADING,
+  RUN_LOADING,
+  REMOVE_NOTE,
+  UPDATE_NOTE,
+} from "./mutations.type";
+
 export default {
   actions: {
-    async fetchNotes(ctx) {
+    async [GET_ALL_NOTES](ctx) {
       try {
-        ctx.commit("runLoading");
+        ctx.commit(RUN_LOADING);
         const res = await fetch(`http://localhost:3080`);
         const data = await res.json();
-        ctx.commit("updateNotes", data);
-        ctx.commit("stopLoading");
+        ctx.commit(UPDATE_NOTES, data);
+        ctx.commit(STOP_LOADING);
       } catch (err) {
         console.log(err);
       }
     },
-    async addNoteToDb(ctx, newNote) {
+    async [ADD_NOTE](ctx, newNote) {
       try {
+        console.log(newNote);
         await fetch("http://localhost:3080/new-notification", {
           method: "POST",
           mode: "cors",
@@ -30,7 +46,7 @@ export default {
         console.log(err);
       }
     },
-    async updateStatus(ctx, id) {
+    async [UPDATE_STATUS](ctx, id) {
       try {
         await fetch(`http://localhost:3080/update-notification/${id}`, {
           method: "PUT",
@@ -40,7 +56,7 @@ export default {
         console.log(err);
       }
     },
-    async dateNoteFromDb(ctx, id) {
+    async [DELETE_NOTE](ctx, id) {
       try {
         await fetch(`http://localhost:3080/delete-notification/${id}`, {
           method: "DELETE",
@@ -54,26 +70,28 @@ export default {
     },
   },
   mutations: {
-    runLoading(state) {
+    [RUN_LOADING](state) {
       state.isLoading = true;
     },
-    stopLoading(state) {
+    [STOP_LOADING](state) {
       // Просто показать что  есть загрузка
       setTimeout(() => (state.isLoading = false), 1000);
     },
-    updateNotes(state, notes) {
+    [UPDATE_NOTE](state, id) {
+      let index = state.notes.findIndex((note) => note.noteId === id);
+      state.notes[index].status = true;
+    },
+    [UPDATE_NOTES](state, notes) {
       state.notes = notes;
     },
-    createNote(state, newNote) {
+    [CREATE_NOTE](state, newNote) {
       state.notes.unshift(newNote);
     },
-    removeNote(state, id) {
+    [REMOVE_NOTE](state, id) {
+      console.log(id);
       state.notes = state.notes.filter((note) => {
-        return note._id !== id;
+        return note.noteId !== id;
       });
-    },
-    setTime: (state) => {
-      state.time = Date.now();
     },
   },
   state: {
@@ -82,36 +100,11 @@ export default {
     time: Date.now(),
   },
   getters: {
-    validDate: (state) => (id) => {
-      const note = state.notes.find((note) => note._id === id);
-      const now = moment(state.time);
-      const end = moment(note.date);
-      const duration = moment.duration(end.diff(now));
-      const d = duration._data;
-      console.log(duration);
-      const date =
-        (d.days > 0 ? `${d.days}д` : "") +
-        " " +
-        (d.hours > 0 ? `${d.hours}ч` : "") +
-        " " +
-        (d.minutes > 0 ? `${d.minutes}мин` : "");
-
-      if (date.trim() === "" && d.seconds <= 0) {
-        return "Событие началось";
-      } else if (d.seconds > 0 && date.trim() === "") {
-        return "Событие скоро начнется";
-      } else {
-        return date;
-      }
-    },
-    allNotes: (state) => {
+    allNotes(state) {
       return state.notes;
     },
-    getLoading: (state) => {
+    getLoading(state) {
       return state.isLoading;
-    },
-    getTime: (state) => {
-      return state.time;
     },
   },
 };
