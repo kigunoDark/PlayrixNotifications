@@ -27,8 +27,8 @@ exports.getNotifications = async (req, res) => {
 
 exports.addNotification = async (req, res) => {
   try {
-    const { event, date, status } = req.body;
-    const note = { event, date, status };
+    const { noteId, event, date, status } = req.body;
+    const note = { noteId, event, date, status };
     const newNote = await new Notification(note);
     await newNote.save();
     res.send(newNote);
@@ -39,10 +39,10 @@ exports.addNotification = async (req, res) => {
 
 exports.updeteAndSendNote = async (req, res) => {
   try {
-    const _id = req.params.id;
-    const updatedNote = await Notification.findOne({ _id });
+    const noteId = req.params.id;
+    const updatedNote = await Notification.findOne({ noteId });
     updatedNote.status = true;
-    await Notification.updateOne({ _id }, updatedNote);
+    await Notification.updateOne({ noteId }, updatedNote);
     const mailOptions = {
       from: "kigunos@yandex.ru",
       to: "krushenitskii@gmail.com ",
@@ -67,8 +67,8 @@ exports.updeteAndSendNote = async (req, res) => {
 
 exports.deleteNotification = async (req, res) => {
   try {
-    const _id = req.params.id;
-    const removedDate = await Notification.deleteOne({ _id });
+    const noteId = req.params.id;
+    const removedDate = await Notification.deleteOne({ noteId });
     res.send(removedDate);
   } catch (err) {
     console.log(err);
